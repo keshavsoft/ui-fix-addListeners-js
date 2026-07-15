@@ -1,7 +1,7 @@
 {
-  "name": "ui-fix-addListeners-js",
-  "version": "1.2.1",
-  "description": "CLI to build for appjs, the endpoints",
+  "name": "ui-fix-add-listeners-js",
+  "version": "1.2.3",
+  "description": "ui hook html id to add listeners file",
   "keywords": [
     "cli",
     "scaffold",
@@ -17,7 +17,7 @@
     ".": "./index.js"
   },
   "bin": {
-    "ui-fix-addListeners-js": "./bin/cli.js"
+    "ui-fix-add-listeners-js": "./bin/cli.js"
   },
   "files": [
     "bin/",
@@ -28,9 +28,9 @@
   "homepage": "https://cli.keshavsoft.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/keshavsoft/ui-fix-addListeners-js"
+    "url": "https://github.com/keshavsoft/ui-fix-add-listeners-js"
   },
   "bugs": {
-    "url": "https://github.com/keshavsoft/ui-fix-addListeners-js/issues"
+    "url": "https://github.com/keshavsoft/ui-fix-add-listeners-js/issues"
   }
 }
