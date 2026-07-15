@@ -1,7 +1,7 @@
 import parseInput from "./core/parseInput.js";
 import showUsage from './core/showUsage.js';
 
-import updateJs, { checkLinesKeys, getCheckLinesValue } from "./UpdateJs/index.js";
+import updateJs, { checkLines } from "./UpdateJs/index.js";
 
 import pkg from '../../package.json' with { type: 'json' };
 

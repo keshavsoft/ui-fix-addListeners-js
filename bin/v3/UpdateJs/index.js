@@ -1,16 +1,8 @@
 import fixAnyJs from "express-fix-any-js";
 import checkLines from "./checkLines.json" with {type: "json"};
 
-const checkLinesKeys = Object.keys(checkLines);
-
-const alterLines = ({ inActionName, inFolderName, inGetType }) => {
-    let checkLinesData = checkLines;
-    if (!checkLinesData[inGetType]) {
-        throw new Error(`Invalid inGetType: ${inGetType}. Must be one of: ${checkLinesKeys.join(", ")}`);
-    };
-
-    // Deep clone the configuration to avoid mutating the cached JSON import.
-    let localCheckLines = JSON.parse(JSON.stringify(checkLinesData[inGetType]));
+const alterLines = ({ inActionName, inFolderName }) => {
+    let localCheckLines = checkLines;
 
     if (localCheckLines.importLines && localCheckLines.importLines.toInsertLine) {
         localCheckLines.importLines.toInsertLine = localCheckLines.importLines.toInsertLine.replaceAll("${folderName}", inFolderName);
@@ -31,17 +23,9 @@ const alterLines = ({ inActionName, inFolderName, inGetType }) => {
     return localCheckLines;
 };
 
-const getCheckLinesValue = ({ inKey }) => {
-    if (!(inKey in checkLines)) {
-        throw new Error(`Invalid inKey: ${inKey}. Must be one of: ${checkLinesKeys.join(", ")}`);
-    };
+const startFunc = ({ inJsFilePath, inActionName, inFolderName, showLog = false }) => {
 
-    return checkLines[inKey];
-};
-
-const startFunc = ({ inJsFilePath, inActionName, inFolderName, showLog = false, inGetType }) => {
-
-    const localCheckLines = alterLines({ inActionName, inFolderName, inGetType });
+    const localCheckLines = alterLines({ inActionName, inFolderName });
 
     const fromFixAnyJs = fixAnyJs({
         showLog,
@@ -52,5 +36,5 @@ const startFunc = ({ inJsFilePath, inActionName, inFolderName, showLog = false, 
     return fromFixAnyJs;
 };
 
-export { getCheckLinesValue, checkLinesKeys };
+export { checkLines };
 export default startFunc;
