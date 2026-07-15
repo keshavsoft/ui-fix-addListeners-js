@@ -8,12 +8,10 @@
         ]
     },
     "useLines": {
-        "toInsertLine": "router.use('/${endpoint}', routerFrom${endpoint});",
-        "toInsertLine_old": "router.get('/${endpoint}', (req, res) => funcFrom${folderName}({ req, res, inTablePath: tablePath }));",
-        "duplicationCheck": "router.use('/${endpoint}'",
+        "toInsertLine": "    ${folderName}();",
+        "duplicationCheck": "${folderName}();",
         "insertAfter": [
-            "router.",
-            "const router = "
+            "const hookAllListeners = () => {"
         ]
     }
 }
