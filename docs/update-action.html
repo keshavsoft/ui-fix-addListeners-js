@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Dependency Action - Detailed Explanation</title>
+    
+    <!-- Google Fonts & Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="./index.html" class="logo">express-fix<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./publish-action.html">Publish</a></li>
+                <li><a href="./notify-action.html">Notify</a></li>
+                <li><a href="./update-action.html" class="active">Update</a></li>
+                <li><a href="./index.html" class="btn-nav-home">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>Update Dependency Action</h1>
+            <p>Detailed analysis of how the repository processes incoming update notifications and updates packages.</p>
+        </header>
+
+        <!-- Triggers -->
+        <section>
+            <h2>1. Webhook Receivers</h2>
+            <p>
+                The workflow `update-dependency.yml` handles automated updates. It filters inbound repository dispatches:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>on:
+  repository_dispatch:
+    types: [dependency-updated]</code>
+            </div>
+            <p>
+                It only runs if the incoming webhook contains the <code>dependency-updated</code> event type payload.
+            </p>
+        </section>
+
+        <!-- Checkout permissions -->
+        <section>
+            <h2>2. Authorization Permissions</h2>
+            <p>
+                Since the workflow needs to commit and push changes back to the repository's main branch, it requires elevated write permissions:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>permissions:
+  contents: write
+  pull-requests: write</code>
+            </div>
+            <p>
+                Additionally, the checkout action must use the `REPO_DISPATCH_TOKEN` secret to authorize pushes, bypassing default GitHub Action runner checkout limits:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- uses: actions/checkout@v4
+  with:
+    token: ${{ secrets.REPO_DISPATCH_TOKEN }}</code>
+            </div>
+        </section>
+
+        <!-- Dynamic Install and Bump -->
+        <section>
+            <h2>3. Upstream Package Install</h2>
+            <p>
+                The job runs clean installations and pulls down the latest release of <code>express-fix-any-js</code>:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">bash</div>
+                <code>npm install
+npm install express-fix-any-js@latest</code>
+            </div>
+        </section>
+
+        <!-- Version Bump -->
+        <section>
+            <h2>4. Conditional Patch Bumping</h2>
+            <p>
+                To maintain version integrity, the workflow evaluates package modifications. If the dependency was updated (altering `package.json`), a patch version is bumped:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">bash</div>
+                <code>git diff --quiet package.json || npm version patch --no-git-tag-version</code>
+            </div>
+            <p>
+                <strong>`--no-git-tag-version`</strong> is crucial because creating a git tag would automatically trigger the publication workflow, causing an infinite deployment loop. We only commit version increments locally here.
+            </p>
+        </section>
+
+        <!-- Git Push back -->
+        <section>
+            <h2>5. Push Back Loop</h2>
+            <p>
+                Finally, changes are committed under the identity of `github-actions[bot]` and pushed:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">bash</div>
+                <code>git config --global user.name "github-actions[bot]"
+git config --global user.email "github-actions[bot]@users.noreply.github.com"
+git add package.json package-lock.json
+if ! git diff --cached --quiet; then
+  git commit -m "Update express-fix-any-js to latest and bump version"
+  git push
+else
+  echo "No changes to commit"
+fi</code>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by KeshavSoft</p>
+            <div class="footer-links">
+                <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

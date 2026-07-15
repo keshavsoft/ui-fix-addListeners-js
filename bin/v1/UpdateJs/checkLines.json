@@ -1,0 +1,58 @@
+{
+    "simple": {
+        "importLines": {
+            "toInsertLine": "import { router as routerFrom${folderName} } from './${folderName}/end-points.js';",
+            "toInsertLine_old": "import funcFrom${folderName} from './${folderName}/controller.js';",
+            "duplicationCheck": "from './${folderName}/end-points.js'",
+            "insertAfter": [
+                "import funcFrom",
+                "import express"
+            ]
+        },
+        "useLines": {
+            "toInsertLine": "router.use('/${endpoint}', routerFrom${endpoint});",
+            "toInsertLine_old": "router.get('/${endpoint}', (req, res) => funcFrom${folderName}({ req, res, inTablePath: tablePath }));",
+            "duplicationCheck": "router.use('/${endpoint}'",
+            "insertAfter": [
+                "router.",
+                "const router = "
+            ]
+        }
+    },
+    "withParams": {
+        "importLines": {
+            "toInsertLine": "import funcFrom${folderName} from './${folderName}/controller.js';",
+            "duplicationCheck": "from './${folderName}/controller.js'",
+            "insertAfter": [
+                "import funcFrom",
+                "import express"
+            ]
+        },
+        "useLines": {
+            "toInsertLine": "router.get('/${endpoint}/:pk', (req, res) => funcFrom${folderName}({ req, res, inTablePath: tablePath }));",
+            "duplicationCheck": "router.get('/${endpoint}'",
+            "insertAfter": [
+                "router.",
+                "const router = "
+            ]
+        }
+    },
+    "withParamsDynamic": {
+        "importLines": {
+            "toInsertLine": "import funcFrom${folderName} from './${folderName}/controller.js';",
+            "duplicationCheck": "from './${folderName}/controller.js'",
+            "insertAfter": [
+                "import funcFrom",
+                "import express"
+            ]
+        },
+        "useLines": {
+            "toInsertLine": "router.get('/${endpoint}/:${inColumnName}', (req, res) => funcFrom${folderName}({ req, res, inTablePath: tablePath }));",
+            "duplicationCheck": "router.get('/${endpoint}'",
+            "insertAfter": [
+                "router.",
+                "const router = "
+            ]
+        }
+    }
+}

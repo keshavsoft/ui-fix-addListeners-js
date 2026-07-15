@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>express-fix-endpoints-get-js - Documentation Portal</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #151d30;
+            --bg-surface-hover: #1e2942;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.12);
+            --accent: #10b981;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(15, 23, 42, 0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .portal-container {
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 40%, #a5f3fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+        }
+
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        @media (max-width: 640px) {
+            .portal-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        .portal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-decoration: none;
+            color: var(--text-main);
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.08);
+            background: var(--bg-surface-hover);
+        }
+
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .portal-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .portal-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .legacy-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+        }
+
+        .legacy-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .legacy-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 30px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <div class="portal-container">
+        <h1>express-fix-endpoints-get-js</h1>
+        <p class="subtitle">Documentation portal for repairing broken Express.js boilerplate code and automating repository workflows.</p>
+
+        <div class="portal-grid">
+            <a href="./about.html" class="portal-card">
+                <div>
+                    <div class="card-icon">📖</div>
+                    <h2>About & Features</h2>
+                    <p>Learn how express-fix automatically scans and repairs imports, exports, and routes boilerplate in Express.js backend structures.</p>
+                </div>
+            </a>
+
+            <a href="./publish-action.html" class="portal-card">
+                <div>
+                    <div class="card-icon">🚀</div>
+                    <h2>NPM Publish Action</h2>
+                    <p>Detailed documentation of the publishing workflow and the safety check preventing publication failures for duplicate versions.</p>
+                </div>
+            </a>
+
+            <a href="./notify-action.html" class="portal-card">
+                <div>
+                    <div class="card-icon">🔔</div>
+                    <h2>Notify Dependents Action</h2>
+                    <p>Explanation of the notification webhook sending repository dispatch triggers downstream after deployment succeeds.</p>
+                </div>
+            </a>
+
+            <a href="./update-action.html" class="portal-card">
+                <div>
+                    <div class="card-icon">🔄</div>
+                    <h2>Update Dependency Action</h2>
+                    <p>Comprehensive guide on how this package responds to upstream updates by pulling and bumping dependencies automatically.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="legacy-section">
+            <a href="../V1/index.html" class="legacy-link">Legacy Page (v1)</a>
+            <a href="../V2/index.html" class="legacy-link">Legacy Page (v2)</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ by KeshavSoft</p>
+    </footer>
+
+</body>
+
+</html>

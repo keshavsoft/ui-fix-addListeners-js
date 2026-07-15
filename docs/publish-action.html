@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NPM Publish Action - Detailed Explanation</title>
+    
+    <!-- Google Fonts & Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="./index.html" class="logo">express-fix<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./publish-action.html" class="active">Publish</a></li>
+                <li><a href="./notify-action.html">Notify</a></li>
+                <li><a href="./update-action.html">Update</a></li>
+                <li><a href="./index.html" class="btn-nav-home">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>NPM Publish Action</h1>
+            <p>Detailed analysis and configuration code paths of the package publishing pipeline.</p>
+        </header>
+
+        <!-- Triggers -->
+        <section>
+            <h2>1. Trigger Conditions</h2>
+            <p>The workflow is configured in <code>publish-and-notify.yml</code> to run under two conditions:</p>
+            <ul>
+                <li><strong>Release Trigger</strong>: Automatically runs when a release is successfully published (<code>release: types [published]</code>).</li>
+                <li><strong>Manual dispatch</strong>: Can be manually triggered by a repository maintainer from the Actions interface (<code>workflow_dispatch</code>).</li>
+            </ul>
+        </section>
+
+        <!-- Step Breakdown -->
+        <section>
+            <h2>2. Execution Jobs Breakdown</h2>
+            <p>The workflow contains two primary sequential jobs: <strong>publish</strong> and <strong>notify-dependents</strong>.</p>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <h3>Job 1: Publish (runs on <code>ubuntu-latest</code>)</h3>
+                <p>Establishes the runtime environment, runs tests, and deploys the build artifact to npmjs:</p>
+                <br>
+                <ul>
+                    <li><strong>Checkout repository</strong>: Fetches the source code using <code>actions/checkout@v4</code>.</li>
+                    <li><strong>Setup Node.js</strong>: Configures Node version 20 and sets the default registry url to <code>https://registry.npmjs.org</code> using <code>actions/setup-node@v4</code>. This automatically configures authentication maps for NPM publish.</li>
+                    <li><strong>Install dependencies</strong>: Executes <code>npm ci</code> for clean, repeatable dependency builds.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Code logic -->
+        <section>
+            <h2>3. Version Safety Publish Script</h2>
+            <p>To avoid build errors if the current local version is already published on the NPM registry (such as running the action on an old branch), the publish step evaluates the NPM registry beforehand:</p>
+            
+            <div class="code-block">
+                <div class="code-lang">bash</div>
+                <code># Step: Publish to npm
+PACKAGE_NAME=$(node -p "require('./package.json').name")
+PACKAGE_VERSION=$(node -p "require('./package.json').version")
+
+# Run query against the registry to see if version exists
+if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+  echo "Version ${PACKAGE_VERSION} of ${PACKAGE_NAME} is already published on npm. Skipping publish."
+else
+  # Only publish if registry query exits with non-zero (404 Not Found)
+  npm publish
+fi</code>
+            </div>
+            
+            <h3>How it works:</h3>
+            <p>
+                1. <strong>`node -p`</strong> reads the `name` and `version` fields directly from the local `package.json`.<br>
+                2. <strong>`npm view <name>@<version> version`</strong> checks if the specified version is indexed in the NPM registry. If the version exists, it returns exit code `0` (success). If the version does not exist, it returns exit code `1` (fail/not found).<br>
+                3. The conditional logic skips publishing on exit code `0`, avoiding redundant publish attempts and preventing workflow failure.
+            </p>
+        </section>
+
+        <!-- Downstream Call -->
+        <section>
+            <h2>4. Calling Notify Dependents</h2>
+            <p>Once the publication job finishes successfully (or skips safely), the second job <strong>notify-dependents</strong> executes. It uses GitHub Actions reusable caller syntax to forward permissions:</p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>notify-dependents:
+  needs: publish
+  uses: ./.github/workflows/notify-dependents.yml
+  secrets:
+    REPO_DISPATCH_TOKEN: ${{ secrets.REPO_DISPATCH_TOKEN }}</code>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by KeshavSoft</p>
+            <div class="footer-links">
+                <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

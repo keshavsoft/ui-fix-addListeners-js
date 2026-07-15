@@ -1,0 +1,36 @@
+{
+  "name": "ui-fix-addListeners-js",
+  "version": "1.2.1",
+  "description": "CLI to build for appjs, the endpoints",
+  "keywords": [
+    "cli",
+    "scaffold",
+    "templates",
+    "node",
+    "project-generator"
+  ],
+  "dependencies": {
+    "express-fix-any-js": "^1.7.7"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "bin": {
+    "ui-fix-addListeners-js": "./bin/cli.js"
+  },
+  "files": [
+    "bin/",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "homepage": "https://cli.keshavsoft.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keshavsoft/ui-fix-addListeners-js"
+  },
+  "bugs": {
+    "url": "https://github.com/keshavsoft/ui-fix-addListeners-js/issues"
+  }
+}

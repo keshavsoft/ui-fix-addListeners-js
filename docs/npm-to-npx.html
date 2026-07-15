@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How express-fix-js Converts Node Execution Into NPX Execution</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Segoe UI, sans-serif;
+    background:#f4f6f9;
+    color:#222;
+    line-height:1.7;
+}
+
+header{
+    background:#111827;
+    color:white;
+    text-align:center;
+    padding:60px 20px;
+}
+
+header h1{
+    font-size:2.7rem;
+    margin-bottom:10px;
+}
+
+header p{
+    font-size:1.1rem;
+    opacity:.9;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:25px;
+    margin-bottom:25px;
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+
+h2{
+    color:#0f172a;
+    margin-bottom:15px;
+}
+
+.code{
+    background:#0f172a;
+    color:#22c55e;
+    padding:15px;
+    border-radius:8px;
+    overflow:auto;
+    margin-top:10px;
+    font-family:Consolas, monospace;
+}
+
+.step{
+    background:#f8fafc;
+    border-left:5px solid #2563eb;
+    padding:15px;
+    margin-top:15px;
+    border-radius:8px;
+}
+
+.flow{
+    background:#eef4ff;
+    border-radius:10px;
+    padding:20px;
+    text-align:center;
+    font-weight:bold;
+    color:#1d4ed8;
+    margin-top:15px;
+}
+
+.highlight{
+    background:#dcfce7;
+    border-left:5px solid #16a34a;
+    padding:15px;
+    margin-top:15px;
+    border-radius:8px;
+}
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#666;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>From Node Command To NPX Command</h1>
+    <p>Understanding How express-fix-js Executes folder1.js Through npm</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>The Original Execution</h2>
+
+<p>Initially the script was executed directly using Node.js.</p>
+
+<div class="code">
+node test/folder1.js k1 true
+</div>
+
+<p style="margin-top:15px;">
+Node directly loads the JavaScript file and executes it.
+</p>
+</div>
+
+<div class="card">
+<h2>The Goal</h2>
+
+<p>
+Instead of asking users to remember file names and folder paths,
+developers want a simple command.
+</p>
+
+<div class="code">
+npx express-fix-js k1 true
+</div>
+
+<p style="margin-top:15px;">
+This looks cleaner and is easier for developers to use.
+</p>
+</div>
+
+<div class="card">
+<h2>The Magic: package.json</h2>
+
+<p>The conversion happens through the <strong>bin</strong> section.</p>
+
+<div class="code">
+"bin": {
+    "express-fix-js": "./test/folder1.js"
+}
+</div>
+
+<div class="highlight">
+When npm sees the command
+<strong>express-fix-js</strong>,
+it automatically executes
+<strong>./test/folder1.js</strong>.
+</div>
+
+</div>
+
+<div class="card">
+<h2>How NPX Works Internally</h2>
+
+<div class="flow">
+User Types
+<br><br>
+npx express-fix-js k1 true
+<br><br>
+↓
+</div>
+
+<div class="flow">
+npm Finds Package
+<br><br>
+express-fix-js
+<br><br>
+↓
+</div>
+
+<div class="flow">
+npm Reads package.json
+<br><br>
+↓
+</div>
+
+<div class="flow">
+Reads bin Configuration
+<br><br>
+"express-fix-js": "./test/folder1.js"
+<br><br>
+↓
+</div>
+
+<div class="flow">
+Executes
+<br><br>
+test/folder1.js
+<br><br>
+↓
+</div>
+
+<div class="flow">
+Application Starts Running
+</div>
+
+</div>
+
+<div class="card">
+<h2>Equivalent Commands</h2>
+
+<div class="step">
+<strong>Direct Execution</strong>
+
+<div class="code">
+node test/folder1.js k1 true
+</div>
+</div>
+
+<div class="step">
+<strong>CLI Execution</strong>
+
+<div class="code">
+npx express-fix-js k1 true
+</div>
+</div>
+
+<p style="margin-top:15px;">
+Both commands eventually execute the same JavaScript file.
+The difference is that NPX uses package.json to discover which file should run.
+</p>
+
+</div>
+
+<div class="card">
+<h2>Execution Chain</h2>
+
+<div class="flow">
+Developer
+<br>↓<br>
+npx express-fix-js k1 true
+<br>↓<br>
+package.json
+<br>↓<br>
+bin
+<br>↓<br>
+./test/folder1.js
+<br>↓<br>
+index.js
+<br>↓<br>
+Business Logic
+</div>
+
+</div>
+
+<div class="card">
+<h2>Key Learning</h2>
+
+<p>
+The <strong>bin</strong> section transforms a JavaScript file into a reusable command-line tool.
+</p>
+
+<div class="code">
+Command Name:
+express-fix-js
+
+Mapped File:
+./test/folder1.js
+</div>
+
+<p style="margin-top:15px;">
+Because of this mapping, developers no longer need to remember
+the actual file location. They only need to remember the command name.
+</p>
+
+</div>
+
+</div>
+
+<footer>
+<h3>Document Written By Hujur</h3>
+<p>Understanding How Node.js Scripts Become NPX CLI Commands</p>
+</footer>
+
+</body>
+</html>
+```

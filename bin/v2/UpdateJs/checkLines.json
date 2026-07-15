@@ -1,0 +1,21 @@
+{
+    "simple": {
+        "importLines": {
+            "toInsertLine": "import folderName from './${folderName}/start.js';",
+            "duplicationCheck": "from './${folderName}/start.js'",
+            "insertAfter": [
+                "import funcFrom",
+                "import express"
+            ]
+        },
+        "useLines": {
+            "toInsertLine": "router.use('/${endpoint}', routerFrom${endpoint});",
+            "toInsertLine_old": "router.get('/${endpoint}', (req, res) => funcFrom${folderName}({ req, res, inTablePath: tablePath }));",
+            "duplicationCheck": "router.use('/${endpoint}'",
+            "insertAfter": [
+                "router.",
+                "const router = "
+            ]
+        }
+    }
+}

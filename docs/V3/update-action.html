@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Dependency - express-fix-endpoints-get-js</title>
+    
+    <!-- Google Fonts & Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="./index.html" class="logo">express-fix<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./publish-action.html">Publish</a></li>
+                <li><a href="./notify-action.html">Notify</a></li>
+                <li><a href="./update-action.html" class="active">Update</a></li>
+                <li><a href="./index.html" class="btn-nav-home">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>Update Dependency Action</h1>
+            <p>Details of the automatic update handler workflow (`update-dependency.yml`).</p>
+        </header>
+
+        <!-- Triggers -->
+        <section>
+            <h2>Workflow Trigger</h2>
+            <p>
+                This workflow is triggered when it receives a `repository_dispatch` webhook (specifically, the event type `dependency-updated`) sent from upstream repositories (like `express-fix-any-js`).
+            </p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>on:
+  repository_dispatch:
+    types: [dependency-updated]
+  workflow_dispatch:</code>
+            </div>
+        </section>
+
+        <!-- Upstream Pull and Install -->
+        <section>
+            <h2>Step 1: Pull and Install Latest Dependency</h2>
+            <p>
+                The runner checks out the branch using the repository dispatch token (which allows write-backs), and executes npm commands to fetch the latest upstream package version:
+            </p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- run: npm install
+- run: npm install express-fix-any-js@latest</code>
+            </div>
+        </section>
+
+        <!-- Patch version bump -->
+        <section>
+            <h2>Step 2: Automated Version Bump</h2>
+            <p>
+                If package files are altered by the dependency update, a version patch command is triggered to bump the patch version without creating full git tags:
+            </p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- name: Bump version if updated
+  run: |
+    git diff --quiet package.json || npm version patch --no-git-tag-version</code>
+            </div>
+        </section>
+
+        <!-- Push back -->
+        <section>
+            <h2>Step 3: Commit and Push</h2>
+            <p>
+                The new version and lock file modifications are committed using git bot details and pushed back to the main branch:
+            </p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- name: Commit and push changes
+  run: |
+    git config --global user.name "github-actions[bot]"
+    git config --global user.email "github-actions[bot]@users.noreply.github.com"
+    git add package.json package-lock.json
+    if ! git diff --cached --quiet; then
+      git commit -m "Update express-fix-any-js to latest and bump version"
+      git push
+    else
+      echo "No changes to commit"
+    fi</code>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by KeshavSoft</p>
+            <div class="footer-links">
+                <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

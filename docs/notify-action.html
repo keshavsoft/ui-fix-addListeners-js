@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notify Dependents Action - Detailed Explanation</title>
+    
+    <!-- Google Fonts & Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="./index.html" class="logo">express-fix<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./publish-action.html">Publish</a></li>
+                <li><a href="./notify-action.html" class="active">Notify</a></li>
+                <li><a href="./update-action.html">Update</a></li>
+                <li><a href="./index.html" class="btn-nav-home">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>Notify Dependents Action</h1>
+            <p>Detailed analysis of the post-publish repository dispatch notification mechanism.</p>
+        </header>
+
+        <!-- Overview -->
+        <section>
+            <h2>1. Reusable Workflow Architecture</h2>
+            <p>
+                The <code>notify-dependents.yml</code> action is built as a reusable callee workflow. It is designed to receive a Personal Access Token (`REPO_DISPATCH_TOKEN`) from the caller publish workflow to authorize API requests against external repositories.
+            </p>
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>on:
+  workflow_call:
+    secrets:
+      REPO_DISPATCH_TOKEN:
+        required: true</code>
+            </div>
+        </section>
+
+        <!-- Replication latency -->
+        <section>
+            <h2>2. Registry Replication Delay</h2>
+            <p>
+                When a package is pushed to npmjs, replication latency across regional registries and CDNs can range from 5 to 15 seconds. If a downstream repository immediately runs an update trigger, it may fetch the old version.
+            </p>
+            <p>
+                To avoid replication race conditions, we pause the step for 15 seconds:
+            </p>
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- name: Wait for NPM registry replication
+  run: sleep 15</code>
+            </div>
+        </section>
+
+        <!-- API Dispatch Payload -->
+        <section>
+            <h2>3. API Dispatch Payload & Headers</h2>
+            <p>
+                Once the replication delay concludes, the action fires a repository dispatch webhook to the downstream dependent project <code>kschema-fs-api-gen-get-actions</code>:
+            </p>
+            
+            <div class="code-block">
+                <div class="code-lang">bash</div>
+                <code>curl -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer ${{ secrets.REPO_DISPATCH_TOKEN }}" \
+  https://api.github.com/repos/keshavsoft/kschema-fs-api-gen-get-actions/dispatches \
+  -d '{"event_type":"dependency-updated"}'</code>
+            </div>
+            
+            <h3>Breakdown of the Webhook Parameters:</h3>
+            <ul>
+                <li><strong><code>-H "Accept: application/vnd.github+json"</code></strong>: Instructs the GitHub API to return answers in the standard JSON format.</li>
+                <li><strong><code>-H "Authorization: Bearer ..."</code></strong>: Attaches the Personal Access Token (PAT) required to authorize dispatch actions.</li>
+                <li><strong><code>-d '{"event_type":"dependency-updated"}'</code></strong>: Sends a JSON payload containing the event identifier. Downstream workflows must register this exact key (<code>dependency-updated</code>) under their dispatch conditions to trigger updates.</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by KeshavSoft</p>
+            <div class="footer-links">
+                <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

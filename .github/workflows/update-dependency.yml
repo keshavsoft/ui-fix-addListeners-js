@@ -1,0 +1,73 @@
+name: Update dependency
+
+on:
+  repository_dispatch:
+    types: [dependency-updated]
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Show Node and NPM versions
+        run: |
+          node -v
+          npm -v
+
+      - run: npm install
+
+      - run: npm install express-fix-any-js@latest
+
+      - name: Check for updates
+        id: check
+        run: |
+          if ! git diff --quiet package.json; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump version if updated
+        if: steps.check.outputs.changed == 'true'
+        run: npm version patch --no-git-tag-version
+
+      - name: Commit and push changes
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "Update express-fix-any-js to latest and bump version"
+          git push
+
+      - name: Publish to NPM
+        if: steps.check.outputs.changed == 'true'
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Wait for NPM registry replication
+        if: steps.check.outputs.changed == 'true'
+        run: sleep 15
+
+      - name: Notify kschema-fs-api-gen-get-actions
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          curl -i -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.REPO_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/keshavsoft/kschema-fs-api-gen-get-actions/dispatches \
+            -d '{"event_type":"dependency-updated"}'

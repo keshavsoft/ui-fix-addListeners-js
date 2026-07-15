@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NPM Publish - express-fix-endpoints-get-js</title>
+    
+    <!-- Google Fonts & Style -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="./index.html" class="logo">express-fix<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="./about.html">About</a></li>
+                <li><a href="./publish-action.html" class="active">Publish</a></li>
+                <li><a href="./notify-action.html">Notify</a></li>
+                <li><a href="./update-action.html">Update</a></li>
+                <li><a href="./index.html" class="btn-nav-home">Home</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1>NPM Publish Actions</h1>
+            <p>Details of the publishing workflows (`publish-and-notify.yml` and `npm-publish.yml`).</p>
+        </header>
+
+        <!-- Triggers -->
+        <section>
+            <h2>Workflow Triggers</h2>
+            <p>These actions can be triggered in two ways:</p>
+            <ul>
+                <li><strong>Automatic Trigger</strong>: Runs whenever a new release is published in the GitHub repository.</li>
+                <li><strong>Manual Trigger</strong>: Can be dispatched manually via the GitHub Actions tab by clicking the <strong>Run workflow</strong> button.</li>
+            </ul>
+        </section>
+
+        <!-- Safety Check -->
+        <section>
+            <h2>Duplicate Version Safety Check</h2>
+            <p>To prevent build failures when attempting to publish a version that already exists on NPM, we added a validation script. The workflow queries NPM's registry via `npm view` before attempting `npm publish`. If the version matches, publication is skipped, and the job exits successfully:</p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>- run: |
+    PACKAGE_NAME=$(node -p "require('./package.json').name")
+    PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+      echo "Version ${PACKAGE_VERSION} of ${PACKAGE_NAME} is already published on npm. Skipping publish."
+    else
+      npm publish
+    fi
+  env:
+    NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}</code>
+            </div>
+        </section>
+
+        <!-- Downstream Propagation -->
+        <section>
+            <h2>Downstream Workflow Call</h2>
+            <p>Immediately after a successful publish (or when publish is safely skipped), the workflow invokes the downstream reusable workflow `notify-dependents.yml` to propagate the update:</p>
+            
+            <div class="code-block">
+                <div class="code-lang">yaml</div>
+                <code>notify-dependents:
+  needs: publish-npm
+  uses: ./.github/workflows/notify-dependents.yml
+  secrets:
+    REPO_DISPATCH_TOKEN: ${{ secrets.REPO_DISPATCH_TOKEN }}</code>
+            </div>
+        </section>
+
+        <section style="text-align: center; margin-top: 30px;">
+            <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js/actions" target="_blank" class="btn-primary">View Runs on GitHub Actions</a>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Built with ❤️ by KeshavSoft</p>
+            <div class="footer-links">
+                <a href="https://github.com/keshavsoft/express-fix-endpoints-get-js" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
