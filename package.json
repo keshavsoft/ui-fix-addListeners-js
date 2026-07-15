@@ -10,7 +10,7 @@
     "project-generator"
   ],
   "dependencies": {
-    "express-fix-any-js": "^1.7.7"
+    "express-fix-any-js": "^1.8.2"
   },
   "type": "module",
   "exports": {

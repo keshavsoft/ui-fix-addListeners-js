@@ -1,7 +1,4 @@
-import Fold1 from './Fold1/start.js';
 const hookAllListeners = () => {
-
-    Fold1();
 };
 
 export default hookAllListeners;

@@ -1,0 +1,17 @@
+{
+    "importLines": {
+        "toInsertLine": "import ${folderName} from './${folderName}/start.js';",
+        "duplicationCheck": "from './${folderName}/start.js'",
+        "insertAfter": [
+            "import ",
+            "import express"
+        ]
+    },
+    "useLines": {
+        "toInsertLine": "    ${folderName}();",
+        "duplicationCheck": "${folderName}();",
+        "insertAfter": [
+            "const hookAllListeners = () => {"
+        ]
+    }
+}
