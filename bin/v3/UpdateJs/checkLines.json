@@ -1,10 +1,10 @@
 {
     "simple": {
         "importLines": {
-            "toInsertLine": "import folderName from './${folderName}/start.js';",
+            "toInsertLine": "import ${folderName} from './${folderName}/start.js';",
             "duplicationCheck": "from './${folderName}/start.js'",
             "insertAfter": [
-                "import funcFrom",
+                "import ",
                 "import express"
             ]
         },
